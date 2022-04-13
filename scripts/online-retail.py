@@ -1,4 +1,6 @@
-from sqlite3 import Timestamp
+from ast import alias
+from ctypes import cast
+from re import A
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
@@ -40,16 +42,6 @@ def qa_Quantity(df):
 	 .otherwise("OK"))
 	print(df.groupBy("qa_Quantity").count().distinct().orderBy("qa_Quantity", ascending=False).show())		
 
-def qa_InvoiceDate(df):
-	df = df.withColumn("InvoiceDate", 
-	F.col("InvoiceDate").cast(TimestampType()))
-	print(df.printSchema())
-
-def qa_UnitPrice(df):
-	df = df.withColumn("UnitPrice", 
-	F.col("UnitPrice").cast(FloatType()))
-	print(df.printSchema())
-
 def qa_CustomerID(df):
 	df = df.withColumn("qa_CustomerID", 
 	F.when(~F.col("CustomerID").rlike("([0-9a-zA-Z]{5})"), "F").otherwise("OK"))
@@ -60,9 +52,67 @@ def qa_Country(df):
 	F.when(F.col("Country").isNull(), "M")
 	 .when(F.col("Country") == "", "M")
 	 .otherwise("OK"))
-	print(df.groupBy("qa_Country").count().distinct().orderBy("qa_Country", ascending=False).show()) 		
+	print(df.groupBy("qa_Country").count().distinct().orderBy("qa_Country", ascending=False).show())
 
- 
+def pergunta_1(df):
+	df = df.withColumn('UnitPrice', F.regexp_replace(F.col('UnitPrice'), ',', '.').cast('float'))
+	print(df.where(F.col('StockCode').rlike('gift_0001'))
+			.agg(F.round(F.sum(F.col('UnitPrice') * F.col('Quantity')), 2).alias('Total_Gift_Cards')).show())	
+
+def pergunta_2(df):
+	df = (df.withColumn('UnitPrice', F.regexp_replace(F.col('UnitPrice'), ',', '.').cast('float'))
+			.withColumn("InvoiceDate", F.to_timestamp(F.col("InvoiceDate"), "d/M/yyyy H:m")))
+	print(df.where(F.col('StockCode').rlike('gift_0001').alias('Gift_Cards'))	
+			.groupBy(F.month("InvoiceDate").alias('mes'))
+			.agg(F.round(F.sum('UnitPrice'), 2).alias('Total_Gift_Cards_Mes'))
+			.orderBy('mes').show())
+
+def pergunta_3(df):
+
+	df = (df.withColumn('UnitPrice', F.regexp_replace(F.col('UnitPrice'), ',', '.').cast('float'))
+			.withColumn("UnitPrice", F.when(F.col("InvoiceNo").startswith('C'), 0).otherwise(F.col("UnitPrice")))
+			)
+	print(df.where(F.col('StockCode')== 'S')
+			.agg(F.round(F.sum(F.col('UnitPrice')), 2).alias('Total_Amostras_Concedidas')).show())	
+
+def pergunta_4(df):
+	df = (df.withColumn("Quantity", F.when(F.col("Quantity").isNull() | (F.col("Quantity") < 0), 0)
+			.otherwise(F.col("Quantity")))
+			)
+	print(df.where(~F.col('StockCode').rlike('C'))
+			.groupBy(F.col('Description'))
+			.agg(F.sum('Quantity').alias('Quantity'))
+			.orderBy(F.col('Quantity').desc())
+			.limit(1)
+			.show()
+			)
+			
+def pergunta_5(df):
+	df = (df.withColumn("Quantity", F.when(F.col("Quantity").isNull() | (F.col("Quantity") < 0), 0)
+			.otherwise(F.col("Quantity")))
+			.withColumn("InvoiceDate", F.to_timestamp(F.col("InvoiceDate"), "d/M/yyyy H:m"))
+			)	
+	print(df.where(~F.col('StockCode').rlike('C'))
+			.groupBy('Description', F.month('InvoiceDate').alias('month'))
+			.agg(F.sum('Quantity').alias('Quantity'))
+			.orderBy(F.col('Quantity').desc()).dropDuplicates(['month'])
+			.show())
+
+def pergunta_6(df):
+	df = (df.withColumn("Quantity", F.when(F.col("Quantity").isNull() | (F.col("Quantity") < 0), 0)
+			.otherwise(F.col("Quantity")))
+			.withColumn("InvoiceDate", F.to_timestamp(F.col("InvoiceDate"), "d/M/yyyy H:m"))
+			.withColumn('UnitPrice', F.regexp_replace(F.col('UnitPrice'), ',', '.').cast('float'))
+			.withColumn('UnitPrice', F.when(F.col('UnitPrice').isNull() | (F.col('UnitPrice') < 0), 0)
+			.otherwise(F.col('UnitPrice')))
+			)
+	print((df.where(~F.col('StockCode').rlike('C'))
+			.groupBy(F.hour('InvoiceDate').alias('hora_de_maior_venda'))
+			.agg(F.round(F.sum(F.col('UnitPrice') * F.col('Quantity')), 2).alias('valor'))
+			.orderBy(F.col('valor').desc())
+			.limit(1)
+			.show()))
+	
 if __name__ == "__main__":
 	sc = SparkContext()
 	spark = (SparkSession.builder.appName("Aceleração PySpark - Capgemini [Online Retail]"))
@@ -77,10 +127,18 @@ if __name__ == "__main__":
 	qa_StockCode(df)
 	qa_Description(df)
 	qa_Quantity(df)
-	qa_InvoiceDate(df)
-	qa_UnitPrice(df)
 	qa_CustomerID(df)
-	qa_Country(df)			  
+	qa_Country(df)
+	pergunta_1(df)
+	pergunta_2(df)
+	pergunta_3(df)
+	pergunta_4(df)
+	pergunta_5(df)
+	pergunta_6(df)
+
+
+	
+	
 
 	
 	
