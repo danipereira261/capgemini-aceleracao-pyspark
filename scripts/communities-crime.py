@@ -205,4 +205,4 @@ if __name__ == "__main__":
 # pergunta_3(df)
 # pergunta_4(df)
 # pergunta_5(df)
-pergunta_6(df)
+# pergunta_6(df)
