@@ -135,69 +135,103 @@ schema_communities_crime = StructType([
 ])
 
 
-def check_is_null(col):
-    return (F.col(col).isNull())
-
-
 def pergunta_1(df):
-    df = (df.withColumn("PolicOperBudg", F.when(check_is_null('PolicOperBudg'), 0)
-                        .otherwise(F.col("PolicOperBudg")))
-          )
-    (df.groupBy(F.col('state'), F.col('communityname'))
-     .agg(F.round(F.sum(F.col('PolicOperBudg')), 2).alias('orcamento_policial'))
-     .orderBy(F.col('orcamento_policial').desc())
-     .show())
+    (df.where(F.col("PolicOperBudg").isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'))
+       .agg(F.round(F.sum(F.col('PolicOperBudg')), 2).alias('orcamento_policial'))
+       .orderBy(F.col('orcamento_policial').desc())
+       .show()
+     )
 
 
 def pergunta_2(df):
-    df = (df.withColumn('ViolentCrimesPerPop', F.when(check_is_null('ViolentCrimesPerPop'), 0)
-                        .otherwise(F.col('ViolentCrimesPerPop')))
-          )
-    (df.groupBy(F.col('state'), F.col('communityname'))
-     .agg(F.round(F.sum(F.col('ViolentCrimesPerPop')), 2).alias('crimes_violentos'))
-     .orderBy(F.col('crimes_violentos').desc())
-     .show())
+    (df.where(F.col('ViolentCrimesPerPop').isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'))
+       .agg(F.round(F.sum(F.col('ViolentCrimesPerPop')), 2).alias('crimes_violentos'))
+       .orderBy(F.col('crimes_violentos').desc())
+       .show()
+     )
 
 
 def pergunta_3(df):
-    df = (df.withColumn('population', F.when(check_is_null('population'), 0)
-                        .otherwise(F.col('population')))
-          )
-    (df.groupBy(F.col('state'), F.col('communityname'))
-     .agg(F.round(F.sum(F.col('population')), 2).alias('populacao'))
-     .orderBy(F.col('populacao').desc())
-     .show())
+    (df.where(F.col('population').isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'))
+       .agg(F.round(F.sum(F.col('population')), 2).alias('populacao'))
+       .orderBy(F.col('populacao').desc())
+       .show()
+     )
 
 
 def pergunta_4(df):
-    df = (df.withColumn('racepctblack', F.when(check_is_null('racepctblack'), 0)
-                        .otherwise(F.col('racepctblack')))
-          )
-    (df.groupBy(F.col('state'), F.col('communityname'))
-     .agg(F.round(F.sum(F.col('racepctblack')), 2).alias('populacao_negra'))
-     .orderBy(F.col('populacao_negra').desc())
-     .show())
+    (df.where(F.col('racepctblack').isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'))
+       .agg(F.round(F.sum(F.col('racepctblack')), 2).alias('populacao_negra'))
+       .orderBy(F.col('populacao_negra').desc())
+       .show()
+     )
 
 
 def pergunta_5(df):
-    df = (df.withColumn('pctWWage', F.when(check_is_null('pctWWage'), 0)
-                        .otherwise(F.col('pctWWage')))
-          )
-    (df.groupBy(F.col('state'), F.col('communityname'))
-     .agg(F.round(F.sum(F.col('pctWWage')), 2).alias('renda_salarial'))
-     .orderBy(F.col('renda_salarial').desc())
-     .show())
+    (df.where(F.col('pctWWage').isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'))
+       .agg(F.round(F.sum(F.col('pctWWage')), 2).alias('renda_salarial'))
+       .orderBy(F.col('renda_salarial').desc())
+       .show()
+     )
 
 
 def pergunta_6(df):
-    df = (df.withColumn('agePct12t29', F.when(check_is_null('agePct12t29'), 0)
-                        .otherwise(F.col('agePct12t29')))
-          )
-    (df.groupBy(F.col('state'), F.col('communityname'))
-     .agg(F.round(F.sum(F.col('agePct12t29')), 2).alias('jovens_entre_12_29_anos'))
-     .orderBy(F.col('jovens_entre_12_29_anos').desc())
-     .limit(1)
-     .show()
+    (df.where(F.col('agePct12t21').isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'))
+       .agg(F.round(F.sum(F.col('agePct12t21')), 2).alias('jovens'))
+       .orderBy(F.col('jovens').desc())
+       .limit(1)
+       .show()
+     )
+
+
+def pergunta_7(df):
+    (df.where(F.col('PolicOperBudg').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+       .agg(F.round(F.corr(F.col('PolicOperBudg'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_8(df):
+    (df.where(F.col('PctPolicWhite').isNotNull() | F.col('PolicOperBudg').isNotNull())
+       .agg(F.round(F.corr(F.col('PctPolicWhite'), (F.col('PolicOperBudg'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_9(df):
+    (df.where(F.col('population').isNotNull() | F.col('PolicOperBudg').isNotNull())
+       .agg(F.round(F.corr(F.col('population'), (F.col('PolicOperBudg'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_10(df):
+    (df.where(F.col('population').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+       .agg(F.round(F.corr(F.col('population'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_11(df):
+    (df.where(F.col('medFamInc').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+       .agg(F.round(F.corr(F.col('medFamInc'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_12(df):
+    (df.where(F.col('ViolentCrimesPerPop').isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'), F.col('racepctblack'),
+                F.col('racePctWhite'), F.col('racePctAsian'), F.col('racePctHisp'))
+       .agg(F.round(F.sum(F.col('ViolentCrimesPerPop')), 2).alias('crimes_violentos'))
+       .orderBy(F.col('crimes_violentos').desc(), F.col('racepctblack').desc(),
+                F.col('racePctWhite').desc(), F.col('racePctAsian').desc(), F.col('racePctHisp').desc()).limit(10).show()
      )
 
 
@@ -218,3 +252,9 @@ pergunta_3(df)
 pergunta_4(df)
 pergunta_5(df)
 pergunta_6(df)
+pergunta_7(df)
+pergunta_8(df)
+pergunta_9(df)
+pergunta_10(df)
+pergunta_11(df)
+pergunta_12(df)
