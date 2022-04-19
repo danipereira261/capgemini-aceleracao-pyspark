@@ -135,16 +135,13 @@ schema_communities_crime = StructType([
 ])
 
 
-def check_is_null(col):
-    return (F.col(col).isNull())
-
-
 def pergunta_1(df):
     (df.where(F.col("PolicOperBudg").isNotNull())
        .groupBy(F.col('state'), F.col('communityname'))
        .agg(F.round(F.sum(F.col('PolicOperBudg')), 2).alias('orcamento_policial'))
        .orderBy(F.col('orcamento_policial').desc())
-       .show())
+       .show()
+     )
 
 
 def pergunta_2(df):
@@ -152,7 +149,8 @@ def pergunta_2(df):
        .groupBy(F.col('state'), F.col('communityname'))
        .agg(F.round(F.sum(F.col('ViolentCrimesPerPop')), 2).alias('crimes_violentos'))
        .orderBy(F.col('crimes_violentos').desc())
-       .show())
+       .show()
+     )
 
 
 def pergunta_3(df):
@@ -160,7 +158,8 @@ def pergunta_3(df):
        .groupBy(F.col('state'), F.col('communityname'))
        .agg(F.round(F.sum(F.col('population')), 2).alias('populacao'))
        .orderBy(F.col('populacao').desc())
-       .show())
+       .show()
+     )
 
 
 def pergunta_4(df):
@@ -168,7 +167,8 @@ def pergunta_4(df):
        .groupBy(F.col('state'), F.col('communityname'))
        .agg(F.round(F.sum(F.col('racepctblack')), 2).alias('populacao_negra'))
        .orderBy(F.col('populacao_negra').desc())
-       .show())
+       .show()
+     )
 
 
 def pergunta_5(df):
@@ -176,7 +176,8 @@ def pergunta_5(df):
        .groupBy(F.col('state'), F.col('communityname'))
        .agg(F.round(F.sum(F.col('pctWWage')), 2).alias('renda_salarial'))
        .orderBy(F.col('renda_salarial').desc())
-       .show())
+       .show()
+     )
 
 
 def pergunta_6(df):
@@ -186,6 +187,51 @@ def pergunta_6(df):
        .orderBy(F.col('jovens').desc())
        .limit(1)
        .show()
+     )
+
+
+def pergunta_7(df):
+    (df.where(F.col('PolicOperBudg').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+       .agg(F.round(F.corr(F.col('PolicOperBudg'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_8(df):
+    (df.where(F.col('PctPolicWhite').isNotNull() | F.col('PolicOperBudg').isNotNull())
+       .agg(F.round(F.corr(F.col('PctPolicWhite'), (F.col('PolicOperBudg'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_9(df):
+    (df.where(F.col('population').isNotNull() | F.col('PolicOperBudg').isNotNull())
+       .agg(F.round(F.corr(F.col('population'), (F.col('PolicOperBudg'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_10(df):
+    (df.where(F.col('population').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+       .agg(F.round(F.corr(F.col('population'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_11(df):
+    (df.where(F.col('medFamInc').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+       .agg(F.round(F.corr(F.col('medFamInc'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
+       .show()
+     )
+
+
+def pergunta_12(df):
+    (df.where(F.col('ViolentCrimesPerPop').isNotNull())
+       .groupBy(F.col('state'), F.col('communityname'), F.col('racepctblack'),
+                F.col('racePctWhite'), F.col('racePctAsian'), F.col('racePctHisp'))
+       .agg(F.round(F.sum(F.col('ViolentCrimesPerPop')), 2).alias('crimes_violentos'))
+       .orderBy(F.col('crimes_violentos').desc(), F.col('racepctblack').desc(),
+                F.col('racePctWhite').desc(), F.col('racePctAsian').desc(), F.col('racePctHisp').desc()).limit(10).show()
      )
 
 
@@ -200,9 +246,15 @@ if __name__ == "__main__":
           .schema(schema_communities_crime)
           .load("/home/spark/capgemini-aceleracao-pyspark/data/communities-crime/communities-crime.csv"))
 
-# pergunta_1(df)
-# pergunta_2(df)
-# pergunta_3(df)
-# pergunta_4(df)
-# pergunta_5(df)
-# pergunta_6(df)
+pergunta_1(df)
+pergunta_2(df)
+pergunta_3(df)
+pergunta_4(df)
+pergunta_5(df)
+pergunta_6(df)
+pergunta_7(df)
+pergunta_8(df)
+pergunta_9(df)
+pergunta_10(df)
+pergunta_11(df)
+pergunta_12(df)
