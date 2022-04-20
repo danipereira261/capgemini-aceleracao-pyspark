@@ -15,7 +15,7 @@ Para executar os Jupyter Notebooks deste repositório é necessário ter o [Spar
 `pip install pyspark findspark`
 
 ## Estrutura de diretórios
-
+``
 ├── LICENSE
 ├── README.md
 ├── data <- Diretório contendo os dados brutos.
@@ -40,4 +40,4 @@ Para executar os Jupyter Notebooks deste repositório é necessário ter o [Spar
 ├── notebooks <- Contém scripts em Jupyter Notebook
 │ ├── 1_quality.ipynb          <- Contém apontamentos de dados inconsistêntes.
 │ ├── 2_transformation.ipynb   <- Contem tratamentos dos dados.
-│ ├── 3_report.ipynb           <- Contém respostas de negócio baseadas em dados.
+│ ├── 3_report.ipynb           <- Contém respostas de negócio baseadas em dados.``
