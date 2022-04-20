@@ -158,7 +158,7 @@ if __name__ == "__main__":
           .format("csv")
           .option("header", "true")
           .schema(schema_online_retail)
-          .load("/home/spark/capgemini-aceleracao-pyspark/data/online-retail/online-retail.csv"))
+          .load("../capgemini-aceleracao-pyspark/data/online-retail/online-retail.csv"))
 
     df_tr = online_retail_tr(df)
 

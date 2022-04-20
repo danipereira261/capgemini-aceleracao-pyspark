@@ -32,6 +32,4 @@ if __name__ == "__main__":
           .format("csv")
           .option("header", "true")
           .schema(schema_census_income)
-          .load("/home/spark/capgemini-aceleracao-pyspark/data/census-income/census-income.csv"))
-
-
+          .load("../capgemini-aceleracao-pyspark/data/census-income/census-income.csv"))
