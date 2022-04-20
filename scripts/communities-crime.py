@@ -197,35 +197,35 @@ def pergunta_6(df):
 
 
 def pergunta_7(df):
-    (df.where(F.col('PolicOperBudg').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+    (df.where(F.col('PolicOperBudg').isNotNull() & F.col('ViolentCrimesPerPop').isNotNull())
        .agg(F.round(F.corr(F.col('PolicOperBudg'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
        .show()
      )
 
 
 def pergunta_8(df):
-    (df.where(F.col('PctPolicWhite').isNotNull() | F.col('PolicOperBudg').isNotNull())
+    (df.where(F.col('PctPolicWhite').isNotNull() & F.col('PolicOperBudg').isNotNull())
        .agg(F.round(F.corr(F.col('PctPolicWhite'), (F.col('PolicOperBudg'))), 2).alias('correlacao'))
        .show()
      )
 
 
 def pergunta_9(df):
-    (df.where(F.col('population').isNotNull() | F.col('PolicOperBudg').isNotNull())
+    (df.where(F.col('population').isNotNull() & F.col('PolicOperBudg').isNotNull())
        .agg(F.round(F.corr(F.col('population'), (F.col('PolicOperBudg'))), 2).alias('correlacao'))
        .show()
      )
 
 
 def pergunta_10(df):
-    (df.where(F.col('population').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+    (df.where(F.col('population').isNotNull() & F.col('ViolentCrimesPerPop').isNotNull())
        .agg(F.round(F.corr(F.col('population'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
        .show()
      )
 
 
 def pergunta_11(df):
-    (df.where(F.col('medFamInc').isNotNull() | F.col('ViolentCrimesPerPop').isNotNull())
+    (df.where(F.col('medFamInc').isNotNull() & F.col('ViolentCrimesPerPop').isNotNull())
        .agg(F.round(F.corr(F.col('medFamInc'), (F.col('ViolentCrimesPerPop'))), 2).alias('correlacao'))
        .show()
      )
